@@ -1,11 +1,15 @@
 <template>
   <view class="page-index">
+    <!-- notice start -->
+    <u-notice-bar :text="announcement" mode="closable"></u-notice-bar>
+    <!-- notice end -->
+
     <!-- search&category start -->
     <u-sticky bgColor="#ffffff" class="search-category">
       <!-- search start -->
       <u-search
         v-model="keywords"
-        placeholder="搜 索 关 键 词"
+        placeholder="搜索关键词"
         :show-action="true"
         actionText="搜索"
         :animation="true"
@@ -13,6 +17,7 @@
         searchIconColor="#667c99"
         color="#667c99"
         bgColor="#fafafa"
+        inputAlign="center"
         @search="handleSearch"
         @clickIcon="handleSearch"
         @custom="handleSearch"
@@ -50,44 +55,91 @@
 </template>
 
 <script>
-import { httpRequest } from "../../api/http";
+import { onSearch, getCategory, getImgListByCategoryId } from "./api";
 
 export default {
   data() {
     return {
+      announcement: "应 该 没 有 Bug 了",
       keywords: "",
       categoryList: [],
       imgList: [],
       pageNum: 1,
       pageSize: 10,
       scrollTop: 0,
+      currentCategoryId: null,
+      option: 0, // Last operation; 0: category, 1: search
     };
   },
+
   onLoad() {},
+
   onReady() {
     this.getCategory();
   },
+
   onPageScroll(e) {
     this.scrollTop = e.scrollTop;
   },
+
   onPullDownRefresh() {
-    uni.stopPullDownRefresh();
+    // reset pageNum
+    this.resetPageNum();
+    // reset imgList
+    this.resetImgList();
+    // Determine the last operation; 0: category, 1: search
+    if (this.option == 0) {
+      this.getImgListByCategoryId(this.currentCategoryId);
+    } else if (this.option == 1) {
+      this.onSearch();
+    }
   },
-  onReachBottom() {},
+
+  onReachBottom() {
+    // pageNum ++
+    this.pageNum++;
+    // Determine the last operation; 0: category, 1: search
+    if (this.option == 0) {
+      this.getImgListByCategoryId(this.currentCategoryId);
+    } else if (this.option == 1) {
+      this.onSearch();
+    }
+  },
+
   methods: {
+    // reset pageNum
+    resetPageNum() {
+      this.pageNum = 1;
+    },
+
+    // reset imgList
+    resetImgList() {
+      this.imgList = [];
+    },
+
+    // handle Search
+    handleSearch() {
+      this.resetPageNum();
+      this.resetImgList();
+      // set last operation; 0: category, 1: search
+      this.option = 1;
+      this.onSearch();
+    },
+
     // search
-    async handleSearch() {
-      await httpRequest({
-        url: "/search",
-        data: {
-          content: this.keywords,
-          pageno: this.pageNum,
-          count: this.pageSize,
-        },
+    async onSearch() {
+      await onSearch({
+        keywords: this.keywords,
+        pageNum: this.pageNum,
+        pageSize: this.pageSize,
       })
         .then((res) => {
+          uni.stopPullDownRefresh();
           if (res.errno == 0) {
-            this.imgList = res.data.list;
+            this.imgList =
+              this.pageNum > 1
+                ? this.imgList.concat(res.data.list)
+                : res.data.list;
           }
         })
         .catch((err) => {
@@ -97,7 +149,7 @@ export default {
 
     // Get category
     async getCategory() {
-      await httpRequest({ url: "/getCategory" })
+      await getCategory()
         .then((res) => {
           if (res.errno == 0) {
             res.data.forEach((category) => {
@@ -108,6 +160,8 @@ export default {
             });
             // Gets the wallpaper of the first category
             this.getImgListByCategoryId(this.categoryList[0].categoryId);
+            // set currentCategoryId
+            this.currentCategoryId = this.categoryList[0].categoryId;
           }
         })
         .catch((err) => {
@@ -117,17 +171,18 @@ export default {
 
     // Gets the wallpaper by categoryId
     async getImgListByCategoryId(categoryId) {
-      await httpRequest({
-        url: "/GetListByCategory",
-        data: {
-          cids: categoryId,
-          pageno: this.pageNum,
-          count: this.pageSize,
-        },
+      await getImgListByCategoryId({
+        categoryId,
+        pageNum: this.pageNum,
+        pageSize: this.pageSize,
       })
         .then((res) => {
+          uni.stopPullDownRefresh();
           if (res.errno == 0) {
-            this.imgList = res.data.list;
+            this.imgList =
+              this.pageNum > 1
+                ? this.imgList.concat(res.data.list)
+                : res.data.list;
           }
         })
         .catch((err) => {
@@ -137,7 +192,13 @@ export default {
 
     // click category
     clickCategory(item) {
+      this.resetPageNum();
+      this.resetImgList();
       this.getImgListByCategoryId(item.categoryId);
+      // set currentCategoryId
+      this.currentCategoryId = item.categoryId;
+      // set last operation; 0: category, 1: search
+      this.option = 0;
     },
 
     // preview img
