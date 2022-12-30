@@ -1,34 +1,38 @@
 <template>
   <view class="page-index">
-    <!-- notice start -->
-    <u-notice-bar :text="announcement" mode="closable"></u-notice-bar>
-    <!-- notice end -->
+    <!-- search&category&notice start -->
+    <u-sticky bgColor="#ffffff" class="sticky" :customNavHeight="-40">
+      <!-- notice start -->
+      <u-notice-bar :text="announcement" mode="closable"></u-notice-bar>
+      <!-- notice end -->
 
-    <!-- search&category start -->
-    <u-sticky bgColor="#ffffff" class="search-category">
-      <!-- search start -->
-      <u-search
-        v-model="keywords"
-        placeholder="搜索关键词"
-        :show-action="true"
-        actionText="搜索"
-        :animation="true"
-        placeholderColor="#667c99"
-        searchIconColor="#667c99"
-        color="#667c99"
-        bgColor="#fafafa"
-        inputAlign="center"
-        @search="handleSearch"
-        @clickIcon="handleSearch"
-        @custom="handleSearch"
-      ></u-search>
-      <!-- search end -->
+      <!-- search&category start -->
+      <view class="search-category">
+        <!-- search start -->
+        <u-search
+          v-model="keywords"
+          placeholder="搜索关键词"
+          :show-action="true"
+          actionText="搜索"
+          :animation="true"
+          placeholderColor="#667c99"
+          searchIconColor="#667c99"
+          color="#667c99"
+          bgColor="#fafafa"
+          inputAlign="center"
+          @search="handleSearch"
+          @clickIcon="handleSearch"
+          @custom="handleSearch"
+        ></u-search>
+        <!-- search end -->
 
-      <!-- category start -->
-      <u-tabs :list="categoryList" @click="clickCategory"></u-tabs>
-      <!-- category end -->
+        <!-- category start -->
+        <u-tabs :list="categoryList" @click="clickCategory"></u-tabs>
+        <!-- category end -->
+      </view>
+      <!-- search&category end -->
     </u-sticky>
-    <!-- search&category end -->
+    <!-- search&category&notice end -->
 
     <!-- img list start -->
     <view class="img-list">
@@ -226,20 +230,26 @@ export default {
 </script>
 
 <style lang="less">
+.page-index {
+  padding: 0;
+}
 .search-category {
   padding: 8px;
 }
-.img-item {
-  position: relative;
-  margin: 8px 4px;
-  .img-tag {
-    padding: 0 4px;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    color: #ffffff;
-    font-size: 0.8rem;
-    background-image: linear-gradient(120deg, #666666aa, #888888aa);
+.img-list {
+  // margin-top: 100px;
+  .img-item {
+    position: relative;
+    margin: 8px 4px;
+    .img-tag {
+      padding: 0 4px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      color: #ffffff;
+      font-size: 0.8rem;
+      background-image: linear-gradient(120deg, #666666aa, #888888aa);
+    }
   }
 }
 </style>
