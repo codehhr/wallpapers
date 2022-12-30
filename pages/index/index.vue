@@ -32,7 +32,9 @@
 
     <!-- img list start -->
     <view class="img-list">
+      <!-- img item start -->
       <view class="img-item" v-for="item in imgList" :key="item.categoryId">
+        <!-- img start -->
         <u--image
           :src="item.url"
           :lazy-load="true"
@@ -44,7 +46,13 @@
             <u-loading-icon></u-loading-icon>
           </template>
         </u--image>
+        <!-- img end -->
+
+        <!-- tags start -->
+        <view class="img-tag">{{ item.tag }}</view>
+        <!-- tags end -->
       </view>
+      <!-- img item end -->
     </view>
     <!-- img list end -->
 
@@ -217,11 +225,21 @@ export default {
 };
 </script>
 
-<style>
+<style lang="less">
 .search-category {
   padding: 8px;
 }
 .img-item {
+  position: relative;
   margin: 8px 4px;
+  .img-tag {
+    padding: 0 4px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    color: #ffffff;
+    font-size: 0.8rem;
+    background-image: linear-gradient(120deg, #666666aa, #888888aa);
+  }
 }
 </style>

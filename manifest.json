@@ -1,5 +1,5 @@
 {
-    "name" : "uniapp-wallpaper",
+    "name" : "免费高清壁纸",
     "appid" : "__UNI__1ED9424",
     "description" : "",
     "versionName" : "1.0.0",
@@ -68,5 +68,11 @@
     "uniStatistics" : {
         "enable" : false
     },
-    "vueVersion" : "2"
+    "vueVersion" : "2",
+    "h5" : {
+        "title" : "免费高清壁纸",
+        "router" : {
+            "base" : "./"
+        }
+    }
 }
